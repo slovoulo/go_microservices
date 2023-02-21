@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"uri": "vscode-remote://wsl+ubuntu-22.04/mnt/c/slovo/dev/go-microservices/front-end"
+		},
+		{
+			"uri": "vscode-remote://wsl+ubuntu-22.04/mnt/c/slovo/dev/go-microservices/broker-service"
+		}
+	],
+	"remoteAuthority": "wsl+Ubuntu-22.04",
+	"settings": {}
+}
