@@ -5,6 +5,18 @@
 		},
 		{
 			"uri": "vscode-remote://wsl+ubuntu-22.04/mnt/c/slovo/dev/go-microservices/broker-service"
+		},
+		{
+			"uri": "vscode-remote://wsl+ubuntu-22.04/mnt/c/slovo/dev/go-microservices/authentication-service"
+		},
+		{
+			"uri": "vscode-remote://wsl+ubuntu-22.04/mnt/c/slovo/dev/go-microservices/microservices-docker"
+		},
+		{
+			"uri": "vscode-remote://wsl+ubuntu-22.04/mnt/c/slovo/dev/go-microservices/logger-service"
+		},
+		{
+			"uri": "vscode-remote://wsl+ubuntu-22.04/mnt/c/slovo/dev/go-microservices/listener-service"
 		}
 	],
 	"remoteAuthority": "wsl+Ubuntu-22.04",

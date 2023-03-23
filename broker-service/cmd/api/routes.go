@@ -22,9 +22,17 @@ var Routes = []Route{
     //Home
 	{
 		Name:        "welcomeScreen",
-		Method:      "GET",
+		Method:      "POST",
 		Pattern:     "/",
         HandlerFunc: handlers.HomeHandler,
+		
+	},
+    //Home
+	{
+		Name:        "brokerHandler",
+		Method:      "POST",
+		Pattern:     "/handle",
+        HandlerFunc: handlers.HandleSubmission,
 		
 	},
 }
