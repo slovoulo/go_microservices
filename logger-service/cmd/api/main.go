@@ -2,17 +2,21 @@ package main
 
 import (
 	"context"
+	"fmt"
+	"net"
 	"os"
 
 	"log"
 
 	"net/http"
+	"net/rpc"
 
 	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 	"github.com/slovojoe/logger-service/data"
+	"github.com/slovojoe/logger-service/rpcserver"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -29,6 +33,7 @@ const (
 
 
 var client *mongo.Client
+
 
 
 type Config struct{
@@ -65,6 +70,10 @@ func main(){
 
          data.New(client)
 
+         //Register the RPC server
+         err=rpc.Register(new(rpcserver.RPCServer))
+         go RPCListen()
+
     muxRouter := mux.NewRouter().StrictSlash(true)
 
 	//specify who's allowed to connect
@@ -94,11 +103,24 @@ func main(){
 
 }
 
-// func (app *Config)serve(){
-//     srv:=&http.Server{
-//         Addr: fmt.Sprintf(":%s",webPort),
-//     }
-// }
+func RPCListen()error{
+    log.Println("Starting rpc server on port ", rpcPort)
+    //start listening to rpc on all IP addresses (0.0.0.0)
+    listen,rpcerr:= net.Listen("tcp", fmt.Sprintf("0.0.0.0:%s",rpcPort))
+    if rpcerr!=nil{
+        log.Println("Error listening to RPC")
+        return rpcerr
+    }
+    defer listen.Close()
+
+    for{
+        rpcConn, err:=listen.Accept()
+        if err !=nil{
+            continue
+        }
+        go rpc.ServeConn(rpcConn)
+    }
+}
 
 func connectToMongo()(*mongo.Client,error){
     mongoUsername := os.Getenv("MONGOUSERNAME")

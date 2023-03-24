@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/rpc"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 	"github.com/slovojoe/broker/event"
@@ -61,8 +62,10 @@ func HandleSubmission(w http.ResponseWriter, r *http.Request){
 	switch requestPayload.Action {
 	case "auth":
 		Authenticate(w,requestPayload.Auth)
+	// case "log":
+	// 	logEventViaRabbit(w,requestPayload.Log)
 	case "log":
-		logEventViaRabbit(w,requestPayload.Log)
+		logItemViaRPC(w,requestPayload.Log)
 
 	default:
 		log.Println("Unknown action/request")
@@ -220,6 +223,43 @@ func pushToQueue(name,msg string )error{
 		return err
 	}
 	return nil
+}
+
+
+type RPCPayload struct{
+	Name string
+	Data string
+}
+func logItemViaRPC(w http.ResponseWriter, l LogPayload){
+	client,err:=rpc.Dial("tcp", "logger-service:5001")
+	if err!=nil{
+		log.Println("Broker RPC dial error", err)
+	}
+
+	//Create a payload with a type that matches what the remote RPC server expects
+	rpcPayload:= RPCPayload{
+		Name:l.Name,
+		Data:l.Data,
+	}
+
+	//Declare a variable to store the rpcPayload result
+	//It will be populated by the remote RPC call
+	var result string
+
+	//Make a call to the RPC server we created in rpc.go
+	//The name should match the name of the server struct in this case RPCServer
+	//Log.Info is the method we are calling also defined in rpc.go
+	err=client.Call("RPCServer.LogInfo",rpcPayload,&result)
+	if err!=nil{
+		log.Println("RPCServer call error", err)
+	}
+	//Return a json to user
+	payload:=jsonResponse{
+		Error: false,
+		Message: result,
+	}
+
+	json.Marshal(payload)
 }
 
 
